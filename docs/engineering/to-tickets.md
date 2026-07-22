@@ -39,7 +39,17 @@ The edges live in the ticket regardless of medium; the medium only decides wheth
 
 The whole skill turns on one distinction. A **horizontal** slice ships one layer of the change — all the schema, or all the API — and nothing works until every layer lands. A **vertical** slice, the tracer bullet, ships one narrow path through *every* layer at once, so it can be demoed the moment it's done.
 
-Before slicing, `to-tickets` looks for prefactoring — "make the change easy, then make the easy change" — and orders that work first. It then quizzes you on the breakdown (granularity, blocking edges, what to merge or split) before publishing anything, and publishes blockers first so each ticket's "Blocked by" can reference a real ticket.
+Before slicing, `to-tickets` looks for prefactoring — "make the change easy, then make the easy change" — and orders that work first. It then quizzes you on the breakdown (granularity, blocking edges, seams, what to merge or split) before publishing anything, and publishes blockers first so each ticket's "Blocked by" can reference a real ticket.
+
+## Every ticket names its seams
+
+Tickets are published `ready-for-agent`, and implementation runs unattended — so anything the ticket leaves unsaid gets decided by an agent with nobody in the room. Where the tests go is too important to lose that way, so every ticket carries a **Seams** section: the test boundary for that slice, what to fake across it, and what must not be faked.
+
+`to-tickets` doesn't invent those seams when it doesn't have to. If you came from a spec, [to-spec](https://aihero.dev/skills-to-spec) already agreed them with you under **Testing Decisions**; `to-tickets` narrows them to the slice at hand and restates them, and the spec wins if a slice seems to pull the other way. Only when there's no spec does it propose seams itself — preferring existing ones, aiming high, keeping the total low.
+
+Seams are named by **module and interface**, never by file path — "the Order intake module's interface." That's the same rule as the rest of the ticket, for the same reason: a module's name survives the prefactoring `to-tickets` just ordered; a path doesn't.
+
+Every ticket gets the section, including prefactors and refactor batches that add no tests at all. Those say so outright — *"None new — the existing suite over the Order intake module must stay green"* — which tells an agent something load-bearing: don't write new tests here, and treat a red suite as your failure. A missing section would be ambiguous; an explicit "none" is a decision.
 
 ## The wide-refactor exception
 
@@ -53,4 +63,4 @@ One shape breaks the tracer-bullet rule: a **wide refactor** — a single mechan
 grill-with-docs → to-spec → to-tickets → implement → code-review
 ```
 
-It sits between [to-spec](https://aihero.dev/skills-to-spec), which hands it a settled spec with user stories to slice against, and [implement](https://aihero.dev/skills-implement), which builds each ticket, driving [tdd](https://aihero.dev/skills-tdd) internally to write the tests test-first, before its [code-review](https://aihero.dev/skills-code-review) pass. Work the frontier one ticket per fresh context, clearing between them. When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
+It sits between [to-spec](https://aihero.dev/skills-to-spec), which hands it a settled spec with user stories to slice against and the seams to carry forward, and [implement](https://aihero.dev/skills-implement), which builds each ticket, driving [tdd](https://aihero.dev/skills-tdd) internally to write the tests test-first at the seams the ticket names, before its [code-review](https://aihero.dev/skills-code-review) pass. Work the frontier one ticket per fresh context, clearing between them. When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
